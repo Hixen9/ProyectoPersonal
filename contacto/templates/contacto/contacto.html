@@ -1,0 +1,32 @@
+{% extends "ProyectoWebApp/base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="contenedorFormulario">
+    {% if "valido" in request.GET %}
+
+    <strong><p style="color:white;text-align: center;">Tus datos han sido enviados Correctamente!</p></strong>
+
+    {% else %}
+
+    <p style="color: white; text-align: center;">!Llena los campos y Contactanos!</p>
+
+    {% endif %}
+
+    <form action="" method="POST" style="text-align: center;">
+
+    {% comment "" %}
+    en este apartado sabemos que el csrf_token es siempre utilizado para cuando se crean 
+    ormularios para que otras paginas externas no traten de llenar automaticamente los campos
+    {% endcomment %}
+    {% csrf_token %}
+
+    <table style="color: white; margin: 20px auto;"> {{miFormulario.as_table}} </table>
+
+    <input type="submit" value="Enviar" style="width: 150px;">
+    </form>
+</div>
+
+{% endblock %}

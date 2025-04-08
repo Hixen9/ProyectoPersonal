@@ -1,0 +1,48 @@
+{% extends "ProyectoWebApp/base.html" %}
+{% load static %}
+{% block content %}
+<section class="container-right">
+    <div class="container" style="margin: auto;"> 
+
+        <div style="float: right;">
+
+
+            {% include "carro/widget.html" %}
+        
+    </div>
+</section>
+    <div class="row">
+
+    <!--En este apartado esta iterando los productos en la variable producto para rescatar la informacion-->
+        {% for producto in productos %}
+
+            <div class="col-md-3">
+
+                <div class="card" style="width: 90%; margin: auto">
+
+                    <img src="{{producto.imagen.url}}" style="height: 200px;" class="card-img-top">
+
+                    <div class="card-body" style="text-align: center;">
+
+                        <h7 class="card-title">{{producto.nombre}}</h7>
+                        
+                        {% load humanize %}
+                        <p class="card-text">$ {{producto.precio_formateado|intcomma}} &nbsp; MXN</p>
+                        
+
+                    </div>
+                    
+                    <div class="card-footer text-center">
+                        <a href="{% url 'carro:agregar' producto.id %}" class="btn btn-success">Agregar al carro</a>
+                    </div>
+
+                </div>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+{% endblock %}
