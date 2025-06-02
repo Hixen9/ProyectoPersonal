@@ -1,16 +1,11 @@
 {% extends "ProyectoWebApp/base.html" %}
 {% load static %}
 {% block content %}
-<section class="container-right">
-    <div class="container" style="margin: auto;"> 
-
-        <div style="float: right;">
-
-
-            {% include "carro/widget.html" %}
-        
-    </div>
-</section>
+  <section style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem;">
+    <!-- ------------------------------------- -->
+    <!-- Sección izquierda: tu contenido aquí -->
+    <!-- ------------------------------------- -->
+    <div style="flex: 1; padding: 1rem;">
     <div class="row">
 
     <!--En este apartado esta iterando los productos en la variable producto para rescatar la informacion-->
@@ -45,4 +40,16 @@
     </div>
 
 </div>
+
+    <!-- ---------------------------- -->
+    <!-- Sidebar: tu widget de carrito -->
+    <!-- ---------------------------- -->
+    <aside style="flex: 0 0 300px; /* ancho fijo */
+                  border: 1px solid #ccc;
+                  padding: 1rem;
+                  box-sizing: border-box;">
+      {% include "carro/widget.html" %}
+    </aside>
+
+  </section>
 {% endblock %}

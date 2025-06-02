@@ -14,6 +14,7 @@
 # elimina  los productos del carro
 # """"
 from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 
 class Carro:
     #Manejo de sesion
@@ -34,26 +35,31 @@ class Carro:
     
     
     def agregar(self,producto):
-        #realizamos una comprobacion para saber si el producto existe todavia
-        if(str(producto.id) not in self.carro.keys()):
-            #La entrada tiene como clave el id del producto y como valor un diccionario
-            self.carro[producto.id]={
-                "producto_id":producto.id,
-                "nombre":producto.nombre,
-                "precio":str(producto.precio),
-                "cantidad":1,
-                "imagen":producto.imagen.url
+          # convierto el precio del producto a Decimal con dos decimales
+        precio_unitario = Decimal(str(producto.precio)).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)
+
+        if str(producto.id) not in self.carro:
+            # Primer agregado: guardo precio y cantidad
+            self.carro[str(producto.id)] = {
+                "producto_id": producto.id,
+                "nombre": producto.nombre,
+                # almaceno el precio formateado como cadena, o bien como Decimal si tu sesión lo soporta
+                "precio": str(precio_unitario),
+                "cantidad": 1,
+                "imagen": producto.imagen.url,
             }
         else:
-            for key,value in self.carro.items():
-                if key == str(producto.id):
-                    value["cantidad"] = value["cantidad"] + 1
-                    value["precio"] = Decimal(value["precio"]) + producto.precio
-                    value["precio"] = float(value["precio"])
-                    break
-                    
+            # Ya existía: incremento cantidad y sumo precio
+            entry = self.carro[str(producto.id)]
+            entry["cantidad"] += 1
+
+            # Saco el precio actual, lo sumo y vuelvo a redondear
+            acumulado = Decimal(entry["precio"]) + precio_unitario
+            acumulado = acumulado.quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)
+            entry["precio"] = str(acumulado)
+
         self.guardar_carro()
-    
+
     def guardar_carro(self):
         self.session["carro"] = self.carro
         self.session.modified = True
@@ -65,14 +71,30 @@ class Carro:
             self.guardar_carro()
             
     def restar_producto(self,producto):
-        for key,value in self.carro.items():
-                if key == str(producto.id):
-                    value["cantidad"] = value["cantidad"] - 1
-                    value["precio"] = Decimal(value["precio"]) - producto.precio
-                    value["precio"] = float(value["precio"])
-                    if value["cantidad"] < 1:
-                        self.eliminar(producto)
-                    break
+        for key, entry in self.carro.items():
+            if key == str(producto.id):
+                # Reducimos la cantidad
+                entry["cantidad"] -= 1
+
+                # Precio unitario formateado a 2 decimales
+                precio_unitario = Decimal(str(producto.precio)).quantize(
+                    Decimal("0.00"), rounding=ROUND_HALF_UP
+                )
+
+                # Calculamos el nuevo precio acumulado
+                acumulado = Decimal(entry["precio"]) - precio_unitario
+
+                # Redondeamos de nuevo a 2 decimales
+                acumulado = acumulado.quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)
+
+                # Guardamos como cadena para evitar problemas de serialización
+                entry["precio"] = str(acumulado)
+
+                # Si ya no queda ninguno, lo eliminamos
+                if entry["cantidad"] < 1:
+                    self.eliminar(producto)
+                break
+
         self.guardar_carro()
     
     def limpiar_carro(self):

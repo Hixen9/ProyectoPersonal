@@ -290,3 +290,19 @@ ul.errorlist{
 
   padding: 5px 0px;
 }
+
+.page-layout {
+  display: flex;
+  align-items: flex-start; /* si quieres que ambos empiecen alineados arriba */
+  gap: 1rem;               /* espacio opcional entre columnas */
+}
+
+.main-content {
+  flex: 1;                 /* ocupa todo el espacio libre */
+  /* aquí van tus estilos de la sección izquierda */
+}
+
+.sidebar {
+  flex: 0 0 300px;         /* ancho fijo de 300px (no crece ni encoge) */
+  /* o usa width:300px; flex-shrink:0; */
+}
