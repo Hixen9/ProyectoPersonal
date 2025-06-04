@@ -1,48 +1,25 @@
 from django.db import models
-from django.contrib.auth import get_user_model
-from tienda.models import Producto
-from django.db.models import F,Sum,FloatField
-
-# Create your models here.
-
-User = get_user_model()
+from django.contrib.auth.models import User
 
 class Pedido(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    
-    
-    def __str__(self):
-        return str(self.id)
-    
-    @property
-    def total(self):
-        return self.lineapedido_set.aggregate(
-            
-            total = Sum(F("precio")*F("cantidad"), output_field=FloatField())
-        )["total"]
-        
-    class Meta:
-        db_table = 'pedidos'
-        verbose_name = 'pedido'
-        verbose_name_plural = 'pedidos'
-        ordering = ['id']
-        
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)  # Puedes luego cambiar a ForeignKey
+    fecha = models.DateTimeField(auto_now_add=True)
 
-class LineaPedido(models.Model):
-    
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
-    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
-    cantidad = models.IntegerField(default=1)
-    created_at = models.DateTimeField(auto_now_add=True)
-    
-    
-    def __str__ (self):
-        return f'{self.cantidad} unidades de {self.producto.nombre}'
-    
-    class Meta:
-        db_table = 'lineapedidos'
-        verbose_name = 'Linea Pedido'
-        verbose_name_plural = 'Linea Pedidos'
-        ordering = ['id']
+class Recibo(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    producto = models.CharField(max_length=255)
+    cantidad = models.IntegerField()
+    precio_total = models.FloatField()
+
+class Paqueteria(models.Model):
+    username_paqueteria = models.CharField(max_length=255, unique=True)
+    contraseña_paqueteria = models.CharField(max_length=20)
+
+class EstadoPedido(models.Model):
+    username_paqueteria = models.CharField(max_length=255)
+    username = models.ForeignKey(User, on_delete=models.CASCADE)
+    pedido = models.CharField(max_length=255)
+    pedido_confirmado = models.BooleanField(default=False)
+    proceso_recoleccion = models.BooleanField(default=False)
+    proceso_envio = models.BooleanField(default=False)
+    entregado = models.BooleanField(default=False)

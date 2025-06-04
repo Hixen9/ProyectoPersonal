@@ -16,8 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from carro.carro import Carro
- 
+from paypal.standard.ipn import urls as paypal_urls
+
+
 
 urlpatterns = [
     path('admin/', admin.site.urls,name="Admin"),
@@ -29,4 +30,6 @@ urlpatterns = [
     path('pedido/',include('pedidos.urls')),
     path('autenticacion/',include('autenticacion.urls')),
     path('',include('ProyectoWebApp.urls')),
+    path('checkout/',include('Paypal.urls')),
+    path('paypal/', include(paypal_urls)),
 ]

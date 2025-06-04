@@ -1,0 +1,42 @@
+{% extends "ProyectoWebApp/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="container mt-5 text-center">
+    <h2 class="text-success">✅ ¡Pago exitoso!</h2>
+    <p>Gracias por tu compra, <strong>{{ user.username }}</strong>.</p>
+
+    {% if pedido %}
+    <p>Tu número de pedido es <strong>#{{ pedido.id }}</strong>.</p>
+
+    <h4 class="mt-4">Resumen del pedido:</h4>
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for linea in lineas %}
+            <tr>
+                <td>{{ linea.producto }}</td>
+                <td>{{ linea.cantidad }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+    <tr>
+        <th>Total</th>
+        <th>${{ total }}</th>
+    </tr>
+</tfoot>
+    </table>
+    {% endif %}
+
+    <div class="mt-4">
+        <a href="{% url 'Tienda' %}" class="btn btn-success">Volver a la tienda</a>
+    </div>
+</div>
+
+{% endblock %}

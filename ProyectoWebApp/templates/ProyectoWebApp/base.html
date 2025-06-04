@@ -71,6 +71,20 @@
     </div>
   </nav>
 
+{% if messages %}
+  <div class="container d-flex justify-content-center mt-3">
+    <div class="col-md-6">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+
+
 
    <!--Contenido Cambiante-->
    {% block content %}

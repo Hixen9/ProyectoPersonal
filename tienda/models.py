@@ -1,32 +1,23 @@
 from django.db import models
 
-# Create your models here.
+class CategoriaProducto(models.Model):
+    nombre = models.CharField(max_length=255)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_updated = models.DateTimeField(auto_now=True)
 
-class CategoriaProd(models.Model):
-    nombre= models.CharField(max_length=50)
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now_add=True)
-    
-    class Meta:
-        verbose_name = "CategoriaProd"
-        verbose_name_plural = "CategoriasProd"
     def __str__(self):
         return self.nombre
 
+
 class Producto(models.Model):
-    nombre = models.CharField(max_length=50)
-    categorias = models.ForeignKey("CategoriaProd", on_delete=models.CASCADE)
-    imagen =models.ImageField(upload_to="tienda",null=True, blank=True)
-    precio = models.DecimalField(max_digits=10, decimal_places=2)
+    nombre = models.CharField(max_length=255)
+    categoria = models.ForeignKey('CategoriaProducto', on_delete=models.CASCADE)
+    imagen = models.ImageField(upload_to='productos/')
+    precio = models.FloatField()
     disponibilidad = models.BooleanField(default=True)
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now_add=True)
-    
-    def precio_formateado(self):
-        return round(self.precio, 2)
-    
-    class Meta:
-        verbose_name = "Producto"
-        verbose_name_plural = "Productos"
+    cantidad = models.PositiveIntegerField(default=0)  # 🆕 stock disponible
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_updated = models.DateTimeField(auto_now=True)
+
     def __str__(self):
-        return f"{self.nombre}" 
+        return self.nombre

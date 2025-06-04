@@ -1,0 +1,15 @@
+{% extends "ProyectoWebApp/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="container mt-5 text-center">
+    <h2 class="text-danger" style="color: white;">❌ Pago cancelado</h2>
+    <p>Tu pago no fue procesado. Si fue un error, puedes intentarlo nuevamente.</p>
+
+    <div class="mt-4">
+        <a href="{% url 'Tienda' %}" class="btn btn-warning">Volver al carrito</a>
+        <a href="{% url 'Tienda' %}" class="btn btn-secondary" style="color: white;">Volver a la tienda</a>
+    </div>
+</div>
+
+{% endblock %}

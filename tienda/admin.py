@@ -1,12 +1,12 @@
 from django.contrib import admin
-from tienda.models import CategoriaProd,Producto
-# Register your models here.
+from .models import CategoriaProducto,Producto
 
-class CategoriaProdAdmin(admin.ModelAdmin):
-    readonly_fields=("created","updated")
-
+@admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
-    readonly_fields=("created","updated")
+    list_display = ('nombre', 'categoria', 'precio', 'cantidad', 'fecha_creacion', 'fecha_updated')
+    readonly_fields = ('fecha_creacion', 'fecha_updated')  # hace que los campos sean visibles pero no editables
 
-admin.site.register(CategoriaProd,CategoriaProdAdmin)
-admin.site.register(Producto,ProductoAdmin)
+@admin.register(CategoriaProducto)
+class CategoriaProductoAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'fecha_creacion', 'fecha_updated')
+    readonly_fields = ('fecha_creacion', 'fecha_updated')

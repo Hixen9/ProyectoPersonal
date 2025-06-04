@@ -1,0 +1,38 @@
+{% extends "ProyectoWebApp/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="container mt-5">
+    <h2 class="text-center" style="color: white;">¡Gracias por tu pedido!</h2>
+
+    <p class="text-center" style="color: white;">Tu número de pedido es: <strong>#{{ pedido.id }}</strong></p>
+
+    <table class="table table-bordered mt-4">
+        <thead>
+            <tr>
+                <th style="color: white;">Producto</th>
+                <th style="color: white;">Cantidad</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for linea in lineas %}
+            <tr>
+                <td style="color: white;">{{ linea.producto }}</td>
+                <td style="color: white;">{{ linea.cantidad }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr>
+            <th style="color: white;">Total</th>
+            <th style="color: white;">${{ total }}</th>
+        </tr>
+    </tfoot>
+    </table>
+
+    <div class="text-center mt-4">
+        <a href="{% url 'Tienda' %}" class="btn btn-success">Volver a la tienda</a>
+    </div>
+</div>
+
+{% endblock %}

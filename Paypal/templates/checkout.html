@@ -1,0 +1,13 @@
+{% extends "ProyectoWebApp/base.html" %}
+{% load static %}
+{% block content %}
+<div class="container mt-5 text-center">
+    <h2 style="color: white;">Resumen del pago</h2>
+    <p style="color: white;">Total a pagar: <strong>${{ total }} MXN</strong></p>
+
+    <form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post">
+        {{ form.as_p }}
+        <input type="submit" value="Pagar con PayPal" class="btn btn-primary">
+    </form>
+</div>
+{% endblock %}

@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     'crispy_bootstrap4',
     'pedidos',
     'django.contrib.humanize',
+    'Paypal',
+    'paypal.standard.ipn',
 ]
 
 MIDDLEWARE = [
@@ -165,3 +167,10 @@ MESSAGE_TAGS={
     mensajes_de_error.ERROR : 'danger',
     
 }
+
+# settings.py
+PAYPAL_CLIENT_ID = 'Af7vBYFRhw7wZ7Nt-Ap8SHezlj9Nx5frzmNWVK8k0DT8gu9eMb_EhSwGcuvj6MwhUok1kR-ukjk8i3xh'
+PAYPAL_SECRET = 'EMZuPLbOe0Xmf4gGCa0k9WIpomNNZPN3siLqmPcKttf7QLJixLCr6MpOcAXoHWOdJcsMDdwfTrn0aqB9'
+PAYPAL_ENVIRONMENT = 'sandbox'  # o 'live' cuando estés en producción
+PAYPAL_RECEIVER_EMAIL = 'sb-x28pe30375611@business.example.com'  # reemplaza por tu cuenta
+PAYPAL_TEST = True  # Usa sandbox
