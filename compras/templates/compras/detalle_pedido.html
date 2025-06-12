@@ -1,0 +1,35 @@
+{% extends "ProyectoWebApp/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="container mt-5">
+    <h2 class="mb-4" style="color: wheat;">Detalle del Pedido #{{ pedido_id }}</h2>
+
+    {% if lineas %}
+        <table class="table table-bordered table-hover" style="background-color: #2c2f33; color: wheat;">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for linea in lineas %}
+                <tr>
+                    <td>{{ linea.producto }}</td>
+                    <td>{{ linea.cantidad }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    {% else %}
+        <div class="alert alert-info text-center">
+            Este pedido no contiene productos.
+        </div>
+    {% endif %}
+
+    <a href="{% url 'mis_compras' %}" class="btn btn-secondary mt-3">Volver a Mis Compras</a>
+</div>
+
+{% endblock %}

@@ -18,8 +18,6 @@ from django.contrib import admin
 from django.urls import path, include
 from paypal.standard.ipn import urls as paypal_urls
 
-
-
 urlpatterns = [
     path('admin/', admin.site.urls,name="Admin"),
     path('servicios/',include('Servicios.urls')),
@@ -32,4 +30,6 @@ urlpatterns = [
     path('',include('ProyectoWebApp.urls')),
     path('checkout/',include('Paypal.urls')),
     path('paypal/', include(paypal_urls)),
+    path('', include('paqueteria.urls')),
+    path('compras/', include('compras.urls')),
 ]

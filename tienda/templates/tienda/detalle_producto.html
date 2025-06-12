@@ -1,0 +1,40 @@
+{% extends "ProyectoWebApp/base.html" %}
+{% load static %}
+{% block content %}
+
+<section style="display: flex; align-items: flex-start; gap: 2rem; padding: 2rem;">
+
+  <!-- Imagen del producto a la izquierda -->
+  <div style="flex: 0 0 400px;">
+    <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" style="width: 100%; height: auto; border: 1px solid #ddd; padding: 10px;">
+  </div>
+
+  <!-- Detalle del producto al centro -->
+  <main style="flex: 1;">
+    <h2 style="font-size: 24px; font-weight: bold; color: white;">{{ producto.nombre }}</h2>
+    
+    <h2 style="font-size: 24px; font-weight: bold; color: white;"> PRECIO
+
+    </h2>
+    
+    <h3 style="color: wheat;">${{ producto.precio }} MXN         
+    <div class="mt-3">
+      <a href="{% url 'carro:agregar' producto.id %}" class="btn btn-success btn-lg">Agregar al carrito</a>
+    </div></h3>
+        <h2 style="font-size: 24px; font-weight: bold; color: white;"> DESCRIPCION
+
+    </h2>
+
+    <p style="font-size: 16px; color: rgb(205, 205, 205);">{{ producto.descripcion }}</p>
+
+
+  </main>
+
+  <!-- Widget del carrito a la derecha -->
+  <aside style="width: 300px; border: 1px solid #ccc; padding: 1rem;">
+    {% include "carro/widget.html" %}
+  </aside>
+
+</section>
+
+{% endblock %}

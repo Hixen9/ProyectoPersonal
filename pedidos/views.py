@@ -8,8 +8,7 @@ from django.contrib import messages
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.core.mail import send_mail
-
-
+from pedidos.models import EstadoPedido,Paqueteria,Recibo
 from django.contrib.auth.decorators import login_required
 
 @login_required(login_url="/autenticacion/logear")
@@ -42,6 +41,33 @@ def procesar_pedido(request):
         producto.save()
 
     LineaPedido.objects.bulk_create(lineas_pedido)
+    # Obtener paquetería por defecto ("estafeta")
+    try:
+        paqueteria = Paqueteria.objects.get(username_paqueteria="Estafeta")
+        username_paqueteria = paqueteria.username_paqueteria
+    except Paqueteria.DoesNotExist:
+        username_paqueteria = ''  # por si no existe
+    # Crear EstadoPedido
+    EstadoPedido.objects.create(
+        username=request.user,
+        pedido=str(pedido.id),
+        username_paqueteria=username_paqueteria,
+        pedido_confirmado=True,
+        proceso_recoleccion=False,
+        proceso_envio=False,
+        entregado=False
+    )
+    # Crear Recibos
+    recibos = []
+    for linea in lineas_pedido:
+        recibos.append(Recibo(
+            usuario=request.user,
+            producto=linea.producto,
+            cantidad=linea.cantidad,
+            precio_total=float(Producto.objects.get(nombre=linea.producto).precio) * linea.cantidad
+        ))
+
+    Recibo.objects.bulk_create(recibos)
 
     enviar_mail(
         pedido=pedido,

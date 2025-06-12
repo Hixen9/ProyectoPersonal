@@ -1,55 +1,90 @@
 {% extends "ProyectoWebApp/base.html" %}
 {% load static %}
 {% block content %}
-  <section style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem;">
-    <!-- ------------------------------------- -->
-    <!-- Sección izquierda: tu contenido aquí -->
-    <!-- ------------------------------------- -->
-    <div style="flex: 1; padding: 1rem;">
+<section style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem;">
+
+  <!-- Categorías a la izquierda -->
+  <aside style="width: 200px; border-right: 1px solid #ccc; padding-right: 1rem;">
+    <h5 style="color: white;">Categorías</h5>
+    <ul class="list-group">
+      <li class="list-group-item {% if not categoria_actual %}active{% endif %}">
+        <a href="{% url 'Tienda' %}" class="text-decoration-none" style="color: black;">Todas</a>
+      </li>
+      {% for cat in categorias %}
+      <li class="list-group-item {% if categoria_actual == cat.id %}active{% endif %}">
+        <a href="?categoria={{ cat.id }}" class="text-decoration-none" style="color: black;">{{ cat.nombre }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+  </aside>
+
+  <!-- Productos al centro -->
+  <main style="flex: 1;">
     <div class="row">
+{% if page_obj %}
+    {% for producto in page_obj %}
+<div class="col-md-3 mb-4 d-flex justify-content-center">
+    <div class="card h-100 text-center" style="width: 250px;"> <!-- controlamos el ancho -->
 
-    <!--En este apartado esta iterando los productos en la variable producto para rescatar la informacion-->
-        {% for producto in productos %}
+        <img src="{{ producto.imagen.url }}" class="card-img-top" style="height: 320px; object-fit: cover;">
 
-            <div class="col-md-3">
+        <div class="card-body p-2">
+            <h5 class="card-title" style="max-height: 40px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                {{ producto.nombre }}
+            </h5>
+            <p class="card-text" style="max-height: 60px; overflow: hidden; text-overflow: ellipsis;">
+                {{ producto.descripcion }}
+            </p>
+            <p class="card-text"><strong>${{ producto.precio }} MXN</strong></p>
+        </div>
 
-                <div class="card" style="width: 90%; margin: auto">
-
-                    <img src="{{producto.imagen.url}}" style="height: 200px;" class="card-img-top">
-
-                    <div class="card-body" style="text-align: center;">
-
-                        <h7 class="card-title">{{producto.nombre}}</h7>
-                        
-                        {% load humanize %}
-                        <p class="card-text">$ {{producto.precio_formateado|intcomma}} &nbsp; MXN</p>
-                        
-
-                    </div>
-                    
-                    <div class="card-footer text-center">
-                        <a href="{% url 'carro:agregar' producto.id %}" class="btn btn-success">Agregar al carro</a>
-                    </div>
-
-                </div>
-
-            </div>
-
-        {% endfor %}
+        <div class="card-footer">
+            <a href="{% url 'carro:agregar' producto.id %}" class="btn btn-success btn-sm">Agregar al carro</a>
+            <a href="{% url 'detalle_producto' producto.id %}" class="btn btn-primary btn-sm mt-2">Ver producto</a>
+        </div>
 
     </div>
-
 </div>
 
-    <!-- ---------------------------- -->
-    <!-- Sidebar: tu widget de carrito -->
-    <!-- ---------------------------- -->
-    <aside style="flex: 0 0 300px; /* ancho fijo */
-                  border: 1px solid #ccc;
-                  padding: 1rem;
-                  box-sizing: border-box;">
-      {% include "carro/widget.html" %}
-    </aside>
+        {% endfor %}
+      {% else %}
+        <div class="col-12">
+          <p class="text-center text-muted">No hay productos en esta categoría.</p>
+        </div>
+      {% endif %}
+    </div>
+  </main>
 
-  </section>
+  <!-- Widget del carrito a la derecha -->
+  <aside style="width: 300px; border: 1px solid #ccc; padding: 1rem;">
+    {% include "carro/widget.html" %}
+  </aside>
+
+</section>
+<nav aria-label="Page navigation">
+  <ul class="pagination justify-content-center">
+    {% if page_obj.has_previous %}
+    <li class="page-item">
+      <a class="page-link" href="?{% if categoria_actual %}categoria={{ categoria_actual }}&{% endif %}page={{ page_obj.previous_page_number }}" aria-label="Anterior">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+      <a class="page-link" href="?{% if categoria_actual %}categoria={{ categoria_actual }}&{% endif %}page={{ num }}">{{ num }}</a>
+    </li>
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+    <li class="page-item">
+      <a class="page-link" href="?{% if categoria_actual %}categoria={{ categoria_actual }}&{% endif %}page={{ page_obj.next_page_number }}" aria-label="Siguiente">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+    {% endif %}
+  </ul>
+</nav>
+
 {% endblock %}

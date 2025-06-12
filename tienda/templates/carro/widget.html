@@ -1,96 +1,68 @@
-
-<table class="table table-bordered" style="color: white;">
-
+<table class="table table-bordered table-sm" style="color: white; table-layout: fixed; width: 100%;">
     <thead>
         <tr>
-
-            <th colspan="3" class="text-center">
-
-                carro compras
-
-            </th>
-
+            <th colspan="3" class="text-center bg-dark">Carro de compras</th>
         </tr>
-
         <tr>
-
-            <th>Producto</th>
-
-            <th>Cantidad</th>
-
-            <th>Suma</th>
-
+            <th style="width: 60%;">Producto</th>
+            <th style="width: 10%;">Cantidad</th>
+            <th style="width: 30%;">Suma</th>
         </tr>
     </thead>
 
     <tbody>
         {% if request.session.carro.items %}
-
-            {% for key,value in request.session.carro.items %}
-
+            {% for key, value in request.session.carro.items %}
                 <tr class="text-center">
                     {% load humanize %}
 
-                    <td>{{value.nombre}}</td>
-
-                    <td>{{value.cantidad}}</td>
-
-                    <td>
-                        <a href="{% url 'carro:agregar' value.producto_id %}" class="btn btn-sm btn-success">+</a>
-
-                        <a href="{% url 'carro:restar' value.producto_id %}" class="btn btn-sm btn-success">-</a>
-
-                        <br>
-
-                        <br>
-
-                        ${{value.precio|intcomma}}  MXN
-
+                    <!-- Producto con truncado -->
+                    <td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-weight: bold; font-size: 13px;">
+                        {{ value.nombre }}
                     </td>
-                    
+
+                    <!-- Cantidad -->
+                    <td>
+                        {{ value.cantidad }}
+                    </td>
+
+                    <!-- Suma + botones -->
+                    <td>
+                        <div class="mb-1">
+                            <a href="{% url 'carro:agregar' value.producto_id %}" class="btn btn-sm btn-success">+</a>
+                            <a href="{% url 'carro:restar' value.producto_id %}" class="btn btn-sm btn-danger">-</a>
+                        </div>
+                        <div>
+                            ${{ value.precio|intcomma }} MXN
+                        </div>
+                    </td>
                 </tr>
-
             {% endfor %}
-
         {% else %}
-
             <tr>
-
                 <td colspan="3">
-
-                    <div class="alert alert-danger text center">
-
-                        sin productos
-
+                    <div class="alert alert-danger text-center mb-0">
+                        Sin productos
                     </div>
-
                 </td>
-
             </tr>
-
         {% endif %}
 
+        <!-- Total -->
         <tr>
             {% load humanize %}
-            <td colspan="3" style="text-align: center;">Total: ${{importe_total_carro|intcomma}} MXN</td>
-
-        </tr>
-        {% if request.session.carro.items %}
-          
-        
-        <tr>
-
-            <td colspan="3" class="text-center" >
-
-                <a href="{% url "checkout" %}" class="btn btn-sm btn-success">Realizar Pago</a>
-
+            <td colspan="3" class="text-center bg-primary">
+                <strong>Total: ${{ importe_total_carro|intcomma }} MXN</strong>
             </td>
-
-
         </tr>
 
+        <!-- Botón de checkout -->
+        {% if request.session.carro.items %}
+        <tr>
+            <td colspan="3" class="text-center">
+                <a href="{% url 'checkout' %}" class="btn btn-success btn-block btn-sm">Realizar Pago</a>
+            </td>
+        </tr>
         {% endif %}
-        
     </tbody>
-
 </table>

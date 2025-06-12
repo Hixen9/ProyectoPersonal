@@ -29,11 +29,21 @@
         
         {% endif %}
         </div>
+        {% if request.session.paqueteria_id %}
+          <div style="text-align: right; margin-right: 125px; color: white;">
+            <a class="nav-link text-warning">
+                🚚 {{ request.session.paqueteria_username }}
+             </a>
+                <a class="nav-link text-warning" href="{% url 'paqueteria_logout' %}" >Cerrar sesión</a></li>
+
+          {% endif %}
+          </div>
+
       
 
 
  <!-- Navbar -->
- <nav class="navbar navbar-expand-lg navbar-dark py-lg-4" id="mainNav">
+ <nav class="navbar navbar-expand-lg navbar-dark py-lg-4" id="mainNav" style="background-color: #2c2f33">
     <div class="container">
       {% comment "" %}
                                                                       Con el formato {% url "" %} obtenemos la url desde urls.py
@@ -50,21 +60,37 @@
           <li class="nav-item {% if request.path == '/contacto/' %}active{% endif %} px-lg-4">
             <a class="nav-link text-uppercase text-expanded" href="{% url "Contacto" %}">Contacto</a>
           </li>
-          {% if user.is_authenticated %}
-          <li class="nav-item {% if request.path == '/tienda/' %}active{% endif %} px-lg-4">
+{% if request.session.paqueteria_id %}
+    <!-- Logueado como Paquetería -->
+          <li class="nav-item {% if request.path == '/paqueteria/dashboard/' %}active{% endif %} px-lg-4">
+            <a class="nav-link text-uppercase text-expanded" href="{% url "paqueteria_dashboard" %}">Dasboard</a>
+          </li>
+
+{% elif request.user.is_authenticated %}
+    <!-- Logueado como Usuario normal -->
+          <li class="nav-item {% if request.path == '/paqueteria/dashboard/' %}active{% endif %} px-lg-4">
             <a class="nav-link text-uppercase text-expanded" href="{% url "Tienda" %}">Tienda</a>
           </li>
-          <li class="nav-item {% if request.path|slice:':6' == '/blog/' %}active{% endif %} px-lg-4">
-            <a class="nav-link text-uppercase text-expanded" href="{% url "Blog" %}">Blogs</a>
+          <li class="nav-item {% if request.path == '/paqueteria/dashboard/' %}active{% endif %} px-lg-4">
+            <a class="nav-link text-uppercase text-expanded" href="{% url "Blog" %}">Blog</a>
           </li>
-          {% else %}
+          <li class="nav-item {% if request.path == '/paqueteria/dashboard/' %}active{% endif %} px-lg-4">
+            <a class="nav-link text-uppercase text-expanded" href="{% url "mis_compras" %}">Mis compras</a>
+          </li>
+
+{% else %}
+    <!-- Sin sesión -->
+          <li class="nav-item {% if request.path == '/autenticacion/logear' %}active{% endif %} px-lg-4">
+            <a class="nav-link text-uppercase text-expanded" href="{% url "logear" %}">Login</a>
+          </li>
           <li class="nav-item {% if request.path == '/autenticacion/' %}active{% endif %} px-lg-4">
             <a class="nav-link text-uppercase text-expanded" href="{% url "Autenticacion" %}">Registrate</a>
           </li>
-          <li class="nav-item {% if request.path == '/logear/' %}active{% endif %} px-lg-4">
-            <a class="nav-link text-uppercase text-expanded" href="{% url "logear" %}">Login</a>
+          <li class="nav-item {% if request.path == '/paqueteria/login/' %}active{% endif %} px-lg-4">
+            <a class="nav-link text-uppercase text-expanded" href="{% url "paqueteria_login" %}">Paqueteria</a>
           </li>
-          {% endif %}
+{% endif %}
+
          
         </ul>
       </div>
@@ -95,7 +121,7 @@
 
 
     <!-- Footer -->
-    <footer class="footer text-faded text-center py-5">
+    <footer class="footer text-faded text-center py-5" style="background-color: #2c2f33">
       <div class="container">
         <p class="m-0">
 	        <a href="#" class="link">

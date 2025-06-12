@@ -3,30 +3,27 @@ from django.views.generic import View
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login,logout, authenticate
 from django.contrib import messages
+from .forms import CustomUserCreationForm
 
 # Create your views here.
 
 class VRegistro(View):
     
-    #esto renderizara el formulario
-    def get(self,request):
-        form = UserCreationForm()
-        return render(request,"registro/registro.html",{"form":form})
+    def get(self, request):
+        form = CustomUserCreationForm()
+        return render(request, "registro/registro.html", {"form": form})
     
-    #esto enviara la informacion a la base de datos
-    def post(self,request):
-        form =UserCreationForm(request.POST)
+    def post(self, request):
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            
             usuario = form.save()
-            
             login(request, usuario)
-            
             return redirect('Home')
         else:
             for msg in form.error_messages:
                 messages.error(request, form.error_messages[msg])
-            return render(request,"registro/registro.html",{"form":form})
+            return render(request, "registro/registro.html", {"form": form})
+
     
 def cerrar_sesion(request):
     logout(request)
