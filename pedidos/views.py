@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.shortcuts import redirect, render
 from carro.carro import Carro
 from carro.models import LineaPedido
@@ -13,89 +14,126 @@ from django.contrib.auth.decorators import login_required
 
 @login_required(login_url="/autenticacion/logear")
 def procesar_pedido(request):
-    username = request.user.username  # usamos el Username como en tu base
     carro = Carro(request)
+    usuario = request.user
 
-    # Creamos el pedido principal
-    pedido = Pedido.objects.create(user=request.user)
+    # Crear el pedido
+    pedido = Pedido.objects.create(user=usuario)
 
     lineas_pedido = []
 
     for key, value in carro.carro.items():
-        producto = Producto.objects.get(id=key)
+        try:
+            producto_obj = Producto.objects.get(id=key)
+        except Producto.DoesNotExist:
+            continue
 
-        lineas_pedido.append(
-            LineaPedido(
-                username=username,
-                producto=producto.nombre,
-                cantidad=value["cantidad"],
-                pedido=str(pedido.id),
-                
-            )
+        # Guardamos solo el nombre del producto como texto
+        linea = LineaPedido(
+            username=usuario.username,
+            producto=producto_obj.nombre,  # ← TEXT
+            pedido=pedido,
+            cantidad=value["cantidad"]
         )
+        lineas_pedido.append(linea)
 
-        # Reducir el stock del producto
-        producto.cantidad -= value["cantidad"]
-        if producto.cantidad <= 0:
-            producto.disponibilidad = False
-        producto.save()
+        # Actualizar stock
+        producto_obj.cantidad -= value["cantidad"]
+        if producto_obj.cantidad <= 0:
+            producto_obj.disponibilidad = False
+        producto_obj.save()
 
     LineaPedido.objects.bulk_create(lineas_pedido)
-    # Obtener paquetería por defecto ("estafeta")
+
+    # Obtener paquetería por defecto
     try:
         paqueteria = Paqueteria.objects.get(username_paqueteria="Estafeta")
         username_paqueteria = paqueteria.username_paqueteria
     except Paqueteria.DoesNotExist:
-        username_paqueteria = ''  # por si no existe
-    # Crear EstadoPedido
+        username_paqueteria = ''
+
     EstadoPedido.objects.create(
-        username=request.user,
-        pedido=str(pedido.id),
+        username=usuario,
+        pedido=pedido,
         username_paqueteria=username_paqueteria,
         pedido_confirmado=True,
         proceso_recoleccion=False,
         proceso_envio=False,
         entregado=False
     )
-    # Crear Recibos
+
+    # Crear recibos
     recibos = []
+    total = 0
     for linea in lineas_pedido:
-        recibos.append(Recibo(
-            usuario=request.user,
-            producto=linea.producto,
-            cantidad=linea.cantidad,
-            precio_total=float(Producto.objects.get(nombre=linea.producto).precio) * linea.cantidad
-        ))
+        try:
+            producto_obj = Producto.objects.get(nombre__iexact=linea.producto.strip())
+            subtotal = producto_obj.precio * linea.cantidad
+            total += subtotal
+            recibos.append(Recibo(
+                usuario=usuario,
+                producto=producto_obj.nombre,
+                cantidad=linea.cantidad,
+                precio_total=subtotal
+            ))
+        except Producto.DoesNotExist:
+            continue
 
     Recibo.objects.bulk_create(recibos)
 
+    # Preparar datos del correo
+    lineas_correo = []
+    for linea in lineas_pedido:
+        try:
+            producto_obj = Producto.objects.get(nombre__iexact=linea.producto.strip())
+            lineas_correo.append({
+                "producto": producto_obj,
+                "cantidad": linea.cantidad,
+                "subtotal": producto_obj.precio * linea.cantidad
+            })
+        except Producto.DoesNotExist:
+            continue
+
     enviar_mail(
         pedido=pedido,
-        lineas_pedido=lineas_pedido,
-        usuario=username,
-        email=request.user.email,
+        lineas_pedido=lineas_correo,
+        usuario=usuario.username,
+        email=usuario.email,
+        total=total,
     )
-    
+
     messages.success(request, "El pedido ha sido creado correctamente")
     carro.limpiar_carro()
-    total = sum(float(item["precio"]) for item in carro.carro.values())
-    # Mostrar resumen del pedido
+
     return render(request, "resumen_pedido.html", {
         "pedido": pedido,
         "lineas": lineas_pedido,
         "total": total
     })
 
+    
 def enviar_mail(**kwargs):
-    asunto = "Gracias por tu pedido - GestorPedidos"
+    pedido = kwargs.get("pedido")
+    lineas_pedido = kwargs.get("lineas_pedido")
+    usuario = kwargs.get("usuario")
+    email = kwargs.get("email")
+    total = kwargs.get("total")
+    domain = kwargs.get("domain", "http://127.0.0.1:8000")  # por defecto para desarrollo
+
+    asunto = f"Gracias por tu pedido #{pedido.id} - GestorPedidos"
+
     mensaje = render_to_string("emails/pedido.html", {
-        "pedido": kwargs.get("pedido"),
-        "lineas_pedido": kwargs.get("lineas_pedido"),
-        "usuario": kwargs.get("usuario"),
-        "emailusuario": kwargs.get("email")
+        "pedido": pedido,
+        "lineas_pedido": lineas_pedido,
+        "usuario": usuario,
+        "emailusuario": email,
+        "total": total,
+        "year": datetime.now().year,
+        "domain": domain
     })
+
     mensaje_texto = strip_tags(mensaje)
     from_email = "xbrand9000@gmail.com"
     to = kwargs.get("email")
-    
+
     send_mail(asunto, mensaje_texto, from_email, [to], html_message=mensaje)

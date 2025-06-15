@@ -9,33 +9,39 @@
         <table class="table table-bordered table-hover" style="background-color: #2c2f33; color: wheat;">
             <thead>
                 <tr>
-                    <th>Pedido</th>
+                    <th>ID Pedido</th>
                     <th>Paquetería</th>
                     <th>Estado</th>
                     <th>Ver detalle</th>
                 </tr>
             </thead>
             <tbody>
-                {% for pedido in pedidos_estado %}
+                {% for estado in pedidos_estado %}
                 <tr>
-                    <td>{{ pedido.pedido }}</td>
-                    <td>{{ pedido.username_paqueteria }}</td>
                     <td>
-                        {% if pedido.entregado %}
+                        {% if estado.pedido %}
+                            {{ estado.pedido.id }}
+                        {% else %}
+                            <span class="text-muted">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ estado.username_paqueteria }}</td>
+                    <td>
+                        {% if estado.entregado %}
                             <span class="badge bg-success">Entregado</span>
-                        {% elif pedido.proceso_envio %}
+                        {% elif estado.proceso_envio %}
                             <span class="badge bg-info text-dark">En tránsito</span>
-                        {% elif pedido.proceso_recoleccion %}
+                        {% elif estado.proceso_recoleccion %}
                             <span class="badge bg-warning text-dark">En recolección</span>
-                        {% elif pedido.pedido_confirmado %}
+                        {% elif estado.pedido_confirmado %}
                             <span class="badge bg-primary">Pedido confirmado</span>
                         {% else %}
                             <span class="badge bg-secondary">Pendiente</span>
                         {% endif %}
                     </td>
                     <td>
-                        {% if pedido.pedido %}
-                            <a href="{% url 'detalle_pedido' pedido.pedido %}">Ver productos</a>
+                        {% if estado.pedido and estado.pedido.id %}
+                            <a href="{% url 'detalle_pedido' estado.pedido.id %}">Ver productos</a>
                         {% else %}
                             <span class="text-muted">Sin productos</span>
                         {% endif %}
@@ -49,7 +55,6 @@
             No tienes compras registradas aún.
         </div>
     {% endif %}
-
 </div>
 
 {% endblock %}

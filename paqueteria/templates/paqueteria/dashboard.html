@@ -9,20 +9,33 @@
 
     {% for pedido in pedidos %}
     <div class="card mb-3 p-3">
-        <h5>Pedido: {{ pedido.Pedido }}</h5>
-        <p>Usuario: {{ pedido.Username }}</p>
+        <h5>Pedido: {{ pedido.pedido }}</h5>
+        <p>Usuario: {{ pedido.username }}</p>
 
         <form method="POST">
             {% csrf_token %}
-            <input type="hidden" name="pedido_id" value="{{ pedido.id }}" style="color: white;">
+            <input type="hidden" name="pedido_id" value="{{ pedido.pedido.id }}" style="color: white;">
 
+
+            <!-- Recolección -->
             <div class="form-check">
-                <input type="checkbox" class="form-check-input" name="en_transito" {% if pedido.ProcesoEnvio %}checked{% endif %}>
-                <label class="form-check-label" style="color: wheat;">En tránsito</label>
+                <input type="checkbox" name="recoleccion"
+                {% if pedido.proceso_recoleccion %}checked disabled{% endif %}>
+                <label class="form-check-label" style="color: wheat;">En recolección</label>
             </div>
 
+            <!-- En ruta -->
             <div class="form-check">
-                <input type="checkbox" class="form-check-input" name="entregado" {% if pedido.Entregado %}checked{% endif %}>
+                <input type="checkbox" name="envio"
+                {% if pedido.proceso_envio %}checked disabled{% endif %}>
+                <label class="form-check-label" style="color: wheat;">En ruta</label>
+            </div>
+            
+            <!-- Entregado -->
+            <div class="form-check">
+                <input type="checkbox" name="entregado"
+                {% if pedido.entregado %}checked disabled{% endif %}>
+
                 <label class="form-check-label" style="color: wheat;">Entregado</label>
             </div>
 

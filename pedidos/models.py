@@ -18,7 +18,7 @@ class Paqueteria(models.Model):
 class EstadoPedido(models.Model):
     username_paqueteria = models.CharField(max_length=255)
     username = models.ForeignKey(User, on_delete=models.CASCADE)
-    pedido = models.CharField(max_length=255)
+    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, null=True)  # ✅ RELACIÓN REAL
     pedido_confirmado = models.BooleanField(default=False)
     proceso_recoleccion = models.BooleanField(default=False)
     proceso_envio = models.BooleanField(default=False)

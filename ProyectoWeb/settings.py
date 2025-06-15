@@ -153,7 +153,7 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_USER = "xbrand9000"
+EMAIL_HOST_USER = "xbrand9000@gmail.com"
 EMAIL_HOST_PASSWORD = "febevecmjwrgoyxw"
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
@@ -176,3 +176,7 @@ PAYPAL_SECRET = 'EMZuPLbOe0Xmf4gGCa0k9WIpomNNZPN3siLqmPcKttf7QLJixLCr6MpOcAXoHWO
 PAYPAL_ENVIRONMENT = 'sandbox'  # o 'live' cuando estés en producción
 PAYPAL_RECEIVER_EMAIL = 'sb-x28pe30375611@business.example.com'  # reemplaza por tu cuenta
 PAYPAL_TEST = True  # Usa sandbox
+
+LOGIN_URL = '/paqueteria/login/'
+LOGIN_REDIRECT_URL = '/paqueteria/dashboard/'
+LOGOUT_REDIRECT_URL = '/paqueteria/login/'

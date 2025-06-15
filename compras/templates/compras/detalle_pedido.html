@@ -1,35 +1,141 @@
 {% extends "ProyectoWebApp/base.html" %}
 {% load static %}
+
 {% block content %}
 
-<div class="container mt-5">
-    <h2 class="mb-4" style="color: wheat;">Detalle del Pedido #{{ pedido_id }}</h2>
+  <style>
+    /* Contenedor con ancho limitado y centrado */
+    .detalle-container {
+      background-color: rgba(255, 255, 255, 0.85);
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      max-width: 800px;
+      margin: 2rem auto;
+      overflow: hidden; /* Para recortar cualquier línea que sobresalga */
+    }
 
-    {% if lineas %}
-        <table class="table table-bordered table-hover" style="background-color: #2c2f33; color: wheat;">
-            <thead>
-                <tr>
-                    <th>Producto</th>
-                    <th>Cantidad</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for linea in lineas %}
-                <tr>
-                    <td>{{ linea.producto }}</td>
-                    <td>{{ linea.cantidad }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    /* Barra de Progreso */
+    .progressbar {
+      counter-reset: step;
+      display: flex;
+      justify-content: space-between;
+      list-style: none;
+      margin-bottom: 2rem;
+      padding: 0;
+    }
+    .progressbar li {
+      position: relative;
+      text-align: center;
+      flex: 1;
+      color: #333;
+    }
+    .progressbar li:before {
+      content: counter(step);
+      counter-increment: step;
+      width: 2rem;
+      height: 2rem;
+      line-height: 2rem;
+      border: 2px solid #ddd;
+      border-radius: 50%;
+      display: block;
+      margin: 0 auto 0.5rem;
+      background-color: #fff;
+      color: #000;
+    }
+    .progressbar li:after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 2px;
+      background-color: #ddd;
+      top: 1rem;
+      left: -50%;
+      z-index: -1;
+    }
 
-    {% else %}
-        <div class="alert alert-info text-center">
-            Este pedido no contiene productos.
-        </div>
-    {% endif %}
+    .progressbar li:first-child:after {
+      content: none;
+    }
+    .progressbar li.completed:before,
+    .progressbar li.active:before {
+      border-color: #28a745;
+    }
+    .progressbar li.completed:after,
+    .progressbar li.active:after {
+      background-color: #28a745;
+    }
+    .progressbar li.completed {
+      color: #28a745;
+    }
+    .progressbar li.active {
+      font-weight: bold;
+      color: #0056b3;
+    }
 
-    <a href="{% url 'mis_compras' %}" class="btn btn-secondary mt-3">Volver a Mis Compras</a>
-</div>
+    /* Tablas y texto */
+    .detalle-container table,
+    .detalle-container th,
+    .detalle-container td {
+      color: #333 !important;
+    }
 
+    /* Resumen de pedido */
+    .order-summary p,
+    .order-summary h4 {
+      color: #333;
+    }
+  </style>
+
+  <div class="detalle-container">
+    <h2>Detalle del Pedido #{{ pedido.pedido }}</h2>
+
+    <!-- Barra de Progresión -->
+    <ul class="progressbar">
+      {% for estado in estados %}
+        {% if forloop.counter0 < estado_index %}
+          <li class="completed">{{ estado|capfirst }}</li>
+        {% elif forloop.counter0 == estado_index %}
+          <li class="active">{{ estado|capfirst }}</li>
+        {% else %}
+          <li>{{ estado|capfirst }}</li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+
+    <!-- Tabla de Productos -->
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Cantidad</th>
+          <th>Precio Unitario</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for linea in lineas %}
+          <tr>
+            <td>{{ linea.producto.nombre }}</td>
+            <td>{{ linea.cantidad }}</td>
+            <td>{{ linea.precio|floatformat:2 }}</td>
+            <td>{{ linea.total|floatformat:2 }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3" class="text-right"><strong>Subtotal:</strong></td>
+          <td><strong>{{ subtotal|floatformat:2 }}</strong></td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <!-- Sección de Precio y Total -->
+    <div class="order-summary mt-4">
+      <p><strong>Precio Total de Productos:</strong> {{ subtotal|floatformat:2 }}</p>
+      <p><strong>Costo de Envío:</strong> {{ costo_envio|floatformat:2 }}</p>
+      <hr>
+      <h4><strong>Total General:</strong> {{ total|floatformat:2 }}</h4>
+    </div>
+  </div>
 {% endblock %}

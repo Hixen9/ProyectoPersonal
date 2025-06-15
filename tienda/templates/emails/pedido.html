@@ -1,16 +1,89 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestor de Pedidos Django – Confirmación de Compra</title>
 </head>
-<body>
+<body style="background-color: #f4f4f4; margin: 0; padding: 0; font-family: Arial, sans-serif;">
+  <table align="center" width="600" cellpadding="0" cellspacing="0"
+         style="background-color: #ffffff; margin: 20px auto; border-collapse: collapse;">
     
-    Hola {{usuario}}<br/>
-    No de pedido: {{pedido.id}}<br/>
-    Email del usuario: {{emailusuario}}<br/>
-    Líneas del pedido: {{lineas_pedido}} 
+    <!-- Encabezado -->
+    <tr>
+      <td style="background-color: #2a9d8f; color: #ffffff; text-align: center; padding: 20px; font-size: 24px;">
+        Gestor de Pedidos Django<br/>
+        <span style="font-size: 18px;">¡Gracias por tu Compra!</span>
+      </td>
+    </tr>
 
+    <!-- Cuerpo del mensaje -->
+    <tr>
+      <td style="padding: 20px;">
+        <p style="font-size: 16px; margin: 0 0 10px;">
+          Hola <strong>{{ usuario }}</strong>,
+        </p>
+        <p style="font-size: 16px; margin: 0 0 20px;">
+          Hemos recibido tu pedido <strong>#{{ pedido.id }}</strong>. A continuación, el resumen de tu compra:
+        </p>
+
+        <!-- Tabla de detalle -->
+        <table width="100%" cellpadding="5" cellspacing="0"
+               style="border: 1px solid #dddddd; border-collapse: collapse;">
+          <!-- Cabecera de tabla -->
+          <tr style="background-color: #e9ecef;">
+            <th align="left"  style="border: 1px solid #dddddd;">Producto</th>
+            <th align="center" style="border: 1px solid #dddddd;">Imagen</th>
+            <th align="center" style="border: 1px solid #dddddd;">Cantidad</th>
+            <th align="right" style="border: 1px solid #dddddd;">Precio unitario</th>
+            <th align="right" style="border: 1px solid #dddddd;">Subtotal</th>
+          </tr>
+
+          <!-- Filas dinámicas -->
+          {% for item in lineas_pedido %}
+          <tr>
+            <td style="border: 1px solid #dddddd;">{{ item.producto.nombre }}</td>
+            <td align="center" style="border: 1px solid #dddddd;">
+              <img src="{{ domain }}{{ item.producto.imagen.url|urlencode }}"
+                alt="{{ item.producto.nombre }}"
+                style="width: 60px; height: 60px; object-fit: cover;">
+
+            </td>
+            <td align="center" style="border: 1px solid #dddddd;">{{ item.cantidad }}</td>
+            <td align="right" style="border: 1px solid #dddddd;">${{ item.producto.precio|floatformat:2 }}</td>
+            <td align="right" style="border: 1px solid #dddddd;">${{ item.subtotal|floatformat:2 }}</td>
+          </tr>
+          {% endfor %}
+
+          <!-- Fila de total -->
+          <tr>
+            <td colspan="4" align="right"
+                style="border: 1px solid #dddddd; font-weight: bold;">
+              Total
+            </td>
+            <td align="right"
+                style="border: 1px solid #dddddd; font-weight: bold;">
+              ${{ total|floatformat:2 }}
+            </td>
+          </tr>
+        </table>
+
+        <p style="font-size: 14px; color: #555555; margin: 20px 0 0;">
+          Este correo es una confirmación automática. Si tienes dudas, responde a este mensaje.
+        </p>
+        <p style="font-size: 14px; color: #555555; margin: 5px 0 0;">
+          ¡Esperamos que disfrutes tu compra!
+        </p>
+      </td>
+    </tr>
+
+    <!-- Pie de página -->
+    <tr>
+      <td style="background-color: #f0f0f0; text-align: center; padding: 10px;
+                 font-size: 12px; color: #888888;">
+        © {{ year }} Gestor de Pedidos Django. Todos los derechos reservados.
+      </td>
+    </tr>
+  </table>
 </body>
 </html>
