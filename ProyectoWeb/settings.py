@@ -27,8 +27,23 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY", "clave-secreta-dev")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "False") == "True"
-ALLOWED_HOSTS = ["*"]
 
+# … tu ALLOWED_HOSTS existente, por ejemplo:
+ALLOWED_HOSTS = [ os.environ.get("RENDER_EXTERNAL_HOSTNAME",""), 
+                  "proyecto-personal-production.up.railway.app",
+                ]
+
+# Si estás detrás de un proxy SSL (Railway / Render):
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# Orígenes confiables para CSRF (tu URL pública, ¡con https!)
+CSRF_TRUSTED_ORIGINS = [
+    "https://proyecto-personal-production.up.railway.app",
+]
+
+# (Opcional, pero recomendado en prod)
+CSRF_COOKIE_SECURE   = True
+SESSION_COOKIE_SECURE = True
 
 # Application definition
 
