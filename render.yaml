@@ -20,9 +20,8 @@ services:
     envVars:
       # URL a tu Postgres gestionado en Render
       - key: DATABASE_URL
-        fromDatabase:
-          name: ProyectoDjangoDB        # ⬅️ El nombre de tu base en Render
-          property: connectionString
+        key: postgresql://soygay_user:3bpSa9ycShabPZpmvo14jh4kSorJumOw@dpg-d18ss1ili9vc73fv8dlg-a:5432/soygay?sslmode=require
+
 
       # Clave secreta de Django
       - key: SECRET_KEY
