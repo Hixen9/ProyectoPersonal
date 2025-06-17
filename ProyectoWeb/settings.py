@@ -92,14 +92,42 @@ WSGI_APPLICATION = 'ProyectoWeb.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+import os
+from pathlib import Path
+import dj_database_url
+from dotenv import load_dotenv
 
-DATABASES = {
-    "default": dj_database_url.config(
-        default=os.environ.get("DATABASE_URL"),
-        conn_max_age=600,
-        ssl_require=True
-    )
-}
+# 1) Carga .env en local (solo si lo necesitas)
+load_dotenv()
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+def configure_database():
+    """
+    Configura DATABASES buscando DATABASE_URL en entorno.
+    Si no existe, deja SQLite para desarrollo local.
+    """
+    db_url = os.environ.get("DATABASE_URL")
+    if not db_url:
+        # Desarrollo local con SQLite
+        return {
+            "default": {
+                "ENGINE": "django.db.backends.sqlite3",
+                "NAME": BASE_DIR / "db.sqlite3",
+            }
+        }
+
+    # Producción: PostgreSQL en Render (ssl_require=True fuerza SSL)
+    return {
+        "default": dj_database_url.config(
+            default=db_url,
+            conn_max_age=600,
+            ssl_require=True
+        )
+    }
+
+DATABASES = configure_database()
+
 
 if not DATABASES:
     # Fallback a SQLite para dev local
