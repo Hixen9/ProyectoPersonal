@@ -11,23 +11,23 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+
 from django.contrib.messages import constants as mensajes_de_error
+import os
+import dj_database_url
+from dotenv import load_dotenv
+
+# Cargar variables desde .env si existen
+load_dotenv()
 
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-v18d5lwz6b6urfr8*a881=t0t*k2oc8h=g71pbgi&exo1(zj#c'
-
+# Seguridad y entorno
+SECRET_KEY = os.environ.get("SECRET_KEY", "clave-secreta-dev")
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+DEBUG = os.environ.get("DEBUG", "False") == "True"
+ALLOWED_HOSTS = [os.environ.get("RENDER_EXTERNAL_HOSTNAME", "127.0.0.1")]
 
 
 # Application definition
@@ -58,6 +58,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -88,15 +89,23 @@ TEMPLATES = [
 WSGI_APPLICATION = 'ProyectoWeb.wsgi.application'
 
 
+
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
 DATABASES = {
-    'default': {
+    'default': dj_database_url.config(
+        default=os.environ.get("DATABASE_URL")
+    )
+}
+if not DATABASES:
+    # Fallback a SQLite para dev local
+    DATABASES = {
+      'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+      }
     }
-}
+
 
 
 # Password validation
@@ -134,13 +143,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL   = '/static/'
+STATIC_ROOT  = BASE_DIR / 'staticfiles'
 
-#guardando en la carpeta de media 
-#Variable MEDIA_URL muestra la ubicacion de la carpeta
-#Variable MEDIA_ROOT copiamos el 'name' de la DB y cambiamos el acceso a 'media'
-MEDIA_URL ="/media/"
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL    = '/media/'
+MEDIA_ROOT   = BASE_DIR / 'media'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -153,8 +161,8 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_USER = "xbrand9000@gmail.com"
-EMAIL_HOST_PASSWORD = "febevecmjwrgoyxw"
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 
@@ -171,12 +179,13 @@ MESSAGE_TAGS={
 }
 
 # settings.py
-PAYPAL_CLIENT_ID = 'Af7vBYFRhw7wZ7Nt-Ap8SHezlj9Nx5frzmNWVK8k0DT8gu9eMb_EhSwGcuvj6MwhUok1kR-ukjk8i3xh'
-PAYPAL_SECRET = 'EMZuPLbOe0Xmf4gGCa0k9WIpomNNZPN3siLqmPcKttf7QLJixLCr6MpOcAXoHWOdJcsMDdwfTrn0aqB9'
+PAYPAL_CLIENT_ID = os.environ.get("PAYPAL_CLIENT_ID")
+PAYPAL_SECRET = os.environ.get("PAYPAL_SECRET")
 PAYPAL_ENVIRONMENT = 'sandbox'  # o 'live' cuando estés en producción
-PAYPAL_RECEIVER_EMAIL = 'sb-x28pe30375611@business.example.com'  # reemplaza por tu cuenta
+PAYPAL_RECEIVER_EMAIL = os.environ.get("PAYPAL_RECEIVER_EMAIL")
 PAYPAL_TEST = True  # Usa sandbox
 
 LOGIN_URL = '/paqueteria/login/'
 LOGIN_REDIRECT_URL = '/paqueteria/dashboard/'
 LOGOUT_REDIRECT_URL = '/paqueteria/login/'
+
