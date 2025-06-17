@@ -1,36 +1,47 @@
+# render.yaml
 services:
   - type: web
-    name: proyecto-personal
-    env: python
+    name: proyecto-personal           # Nombre único de tu servicio en Render
+    env: python                     # Opcional: cambia si usas otra región
+
+    # 1) Build: instala tus dependencias
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn ProyectoWeb.wsgi:application"
-    postDeployCommand: >
-      python manage.py migrate &&
-      python manage.py loaddata datos.json &&
-      python manage.py collectstatic --noinput
+
+    # 2) Arranque: corre migraciones, carga datos, static y luego Gunicorn
+    startCommand: >-
+      bash -lc "
+        python manage.py migrate &&
+        python manage.py loaddata datos.json &&
+        python manage.py collectstatic --noinput &&
+        exec gunicorn ProyectoWeb.wsgi:application --bind 0.0.0.0:\$PORT
+      "
+
+    # 3) Variables de entorno
     envVars:
+      # URL a tu Postgres gestionado en Render
       - key: DATABASE_URL
         fromDatabase:
-          name: ProyectoDjangoDB
+          name: ProyectoDjangoDB        # ⬅️ El nombre de tu base en Render
           property: connectionString
 
+      # Clave secreta de Django
       - key: SECRET_KEY
         value: django-insecure-v18d5lwz6b6urfr8*a881=t0t*k2oc8h=g71pbgi&exo1(zj#c
 
+      # DEBUG en False para prod
       - key: DEBUG
         value: "False"
 
+      # SMTP
       - key: EMAIL_HOST_USER
         value: xbrand9000@gmail.com
-
       - key: EMAIL_HOST_PASSWORD
         value: febevecmjwrgoyxw
 
+      # PayPal
       - key: PAYPAL_CLIENT_ID
         value: Af7vBYFRhw7wZ7Nt-Ap8SHezlj9Nx5frzmNWVK8k0DT8gu9eMb_EhSwGcuvj6MwhUok1kR-ukjk8i3xh
-
       - key: PAYPAL_SECRET
         value: EMZuPLbOe0Xmf4gGCa0k9WIpomNNZPN3siLqmPcKttf7QLJixLCr6MpOcAXoHWOdJcsMDdwfTrn0aqB9
-
       - key: PAYPAL_RECEIVER_EMAIL
         value: sb-x28pe30375611@business.example.com
