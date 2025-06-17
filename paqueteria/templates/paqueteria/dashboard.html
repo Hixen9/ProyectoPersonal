@@ -1,49 +1,120 @@
+
 {% extends "ProyectoWebApp/base.html" %}
 {% load static %}
 {% block content %}
 
-<div class="container mt-5">
-    
-    <h2 class="mb-4" style="color: wheat; text-align: center;">Bienvenido {{ request.session.paqueteria_username }}</h2>
-    <h2 class="mb-4" style="color: wheat;">Gestión de envíos</h2>
+<style>
+    body {
+        background-color: #2c2f33;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
 
-    {% for pedido in pedidos %}
-    <div class="card mb-3 p-3">
-        <h5>Pedido: {{ pedido.pedido }}</h5>
-        <p>Usuario: {{ pedido.username }}</p>
+    .pedidos-wrapper {
+        background: linear-gradient(145deg, #2c2f33, #2c2f33);
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
 
-        <form method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="pedido_id" value="{{ pedido.pedido.id }}" style="color: white;">
+    .container {
+        max-width: 900px;
+        margin-top: 50px;
+    }
 
+    .card {
+        background-color: rgba(255, 255, 255, 0.60);
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+    }
 
-            <!-- Recolección -->
-            <div class="form-check">
-                <input type="checkbox" name="recoleccion"
-                {% if pedido.proceso_recoleccion %}checked disabled{% endif %}>
-                <label class="form-check-label" style="color: wheat;">En recolección</label>
-            </div>
+    .card h5 {
+        color: #212529;
+    }
 
-            <!-- En ruta -->
-            <div class="form-check">
-                <input type="checkbox" name="envio"
-                {% if pedido.proceso_envio %}checked disabled{% endif %}>
-                <label class="form-check-label" style="color: wheat;">En ruta</label>
-            </div>
-            
-            <!-- Entregado -->
-            <div class="form-check">
-                <input type="checkbox" name="entregado"
-                {% if pedido.entregado %}checked disabled{% endif %}>
+    .card p {
+        color: #495057;
+    }
 
-                <label class="form-check-label" style="color: wheat;">Entregado</label>
-            </div>
+    .form-check-label {
+        margin-left: 6px;
+        margin-right: 16px;
+        color: #444;
+        font-weight: 500;
+    }
 
-            <button type="submit" class="btn btn-success mt-3">Actualizar</button>
-        </form>
+    .btn-success {
+        background-color: #4CAF50;
+        border-color: #4CAF50;
+    }
+
+    .btn-success:hover {
+        background-color: #45a049;
+        border-color: #45a049;
+    }
+
+    .pedido-completado {
+        color: #28a745;
+        font-weight: bold;
+        font-size: 1rem;
+        margin-top: 15px;
+    }
+</style>
+
+<div class="container">
+    <div class="pedidos-wrapper">
+        <h2 class="mb-4 text-center text-white" style="color: white;">Bienvenido {{ request.session.paqueteria_username }}</h2>
+        <h4 class="mb-4 text-muted text-center">Gestión de pedidos</h4>
+
+        {% for pedido in pedidos %}
+        <div class="card mb-4 shadow-sm p-4">
+            <h5 class="mb-2">Pedido: <strong>{{ pedido.pedido }}</strong></h5>
+            <p class="mb-3">Usuario: <strong>{{ pedido.username }}</strong></p>
+
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="pedido_id" value="{{ pedido.pedido.id }}">
+
+                <div class="form-check form-check-inline">
+                    {% if pedido.proceso_recoleccion %}
+                        <input type="hidden" name="recoleccion" value="on">
+                        <input class="form-check-input" type="checkbox" checked disabled>
+                    {% else %}
+                        <input class="form-check-input" type="checkbox" name="recoleccion">
+                    {% endif %}
+                    <label class="form-check-label">En recolección</label>
+                </div>
+
+                <div class="form-check form-check-inline">
+                    {% if pedido.proceso_envio %}
+                        <input type="hidden" name="envio" value="on">
+                        <input class="form-check-input" type="checkbox" checked disabled>
+                    {% else %}
+                        <input class="form-check-input" type="checkbox" name="envio">
+                    {% endif %}
+                    <label class="form-check-label">En ruta</label>
+                </div>
+
+                <div class="form-check form-check-inline">
+                    {% if pedido.entregado %}
+                        <input type="hidden" name="entregado" value="on">
+                        <input class="form-check-input" type="checkbox" checked disabled>
+                    {% else %}
+                        <input class="form-check-input" type="checkbox" name="entregado">
+                    {% endif %}
+                    <label class="form-check-label">Entregado</label>
+                </div>
+
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-success">Actualizar</button>
+                </div>
+
+                {% if pedido.proceso_recoleccion and pedido.proceso_envio and pedido.entregado %}
+                    <div class="pedido-completado text-center">✔ Pedido completado</div>
+                {% endif %}
+            </form>
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
-
 </div>
 
 {% endblock %}
