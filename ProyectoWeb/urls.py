@@ -17,6 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from paypal.standard.ipn import urls as paypal_urls
+from django.conf import settings
+from django.views.static import serve
+from django.urls import re_path
+
 
 urlpatterns = [
     path('admin/', admin.site.urls,name="Admin"),
@@ -32,4 +36,11 @@ urlpatterns = [
     path('paypal/', include(paypal_urls)),
     path('', include('paqueteria.urls')),
     path('compras/', include('compras.urls')),
+]
+
+# Sirve los archivos de MEDIA en producción (no recomendado a largo plazo)
+urlpatterns += [
+    re_path(r'^media/(?P<path>.*)$', serve, {
+        'document_root': settings.MEDIA_ROOT,
+    }),
 ]
