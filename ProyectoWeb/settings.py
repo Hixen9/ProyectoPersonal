@@ -241,3 +241,5 @@ LOGIN_URL = '/paqueteria/login/'
 LOGIN_REDIRECT_URL = '/paqueteria/dashboard/'
 LOGOUT_REDIRECT_URL = '/paqueteria/login/'
 
+SITE_URL = os.environ.get("SITE_URL", "https://proyecto-personal-production.up.railway.app")
+

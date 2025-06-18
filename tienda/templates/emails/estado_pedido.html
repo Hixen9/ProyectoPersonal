@@ -50,7 +50,7 @@
             <tr style="border-bottom: 1px solid #ddd;">
               <td>{{ item.producto.nombre }}</td>
               <td align="center">
-                <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}"
+                <img src="{{ domain }}{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}"
                      style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px;">
               </td>
               <td align="center">{{ item.cantidad }}</td>

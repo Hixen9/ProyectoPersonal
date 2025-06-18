@@ -1,4 +1,5 @@
 
+from django.conf import settings
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from pedidos.models import EstadoPedido, Pedido, Paqueteria
@@ -89,7 +90,7 @@ def enviar_estado_mail(**kwargs):
     usuario = kwargs.get("usuario")
     email = kwargs.get("email")
     estado_actual = kwargs.get("estado_actual")
-    domain = kwargs.get("domain", "http://127.0.0.1:8000")
+    domain = settings.SITE_URL
 
     if not pedido or not email or not productos:
         print("Faltan datos para enviar correo")

@@ -11,6 +11,7 @@ from django.utils.html import strip_tags
 from django.core.mail import send_mail
 from pedidos.models import EstadoPedido,Paqueteria,Recibo
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 
 @login_required(login_url="/autenticacion/logear")
 def procesar_pedido(request):
@@ -118,7 +119,7 @@ def enviar_mail(**kwargs):
     usuario = kwargs.get("usuario")
     email = kwargs.get("email")
     total = kwargs.get("total")
-    domain = kwargs.get("domain", "http://127.0.0.1:8000")  # por defecto para desarrollo
+    domain = settings.SITE_URL  # por defecto para desarrollo
 
     asunto = f"Gracias por tu pedido #{pedido.id} - GestorPedidos"
 
